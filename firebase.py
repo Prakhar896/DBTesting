@@ -165,6 +165,8 @@ class FireRTDB:
                 return {}
             elif fetchedData == 1:
                 return []
+            elif not (isinstance(fetchedData, dict) or isinstance(fetchedData, list)):
+                return fetchedData
         
         tempData = copy.deepcopy(fetchedData)
 
