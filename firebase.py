@@ -89,7 +89,7 @@ class FireRTDB:
             return "ERROR: FireRTDB service operation permission denied."
         try:
             ref = db.reference(refPath)
-            ref.set({})
+            ref.delete()
         except Exception as e:
             return "ERROR: Error occurred in clearing children at that ref; error: {}".format(e)
         return True
