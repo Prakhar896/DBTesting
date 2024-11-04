@@ -1,9 +1,6 @@
 from models import *
+# DI.failoverStrategy = "efficient"
 DI.setup()
-import time
-time.sleep(10)
-a = DI.load(Ref("c"))
-print(a)
 
 while True:
-    exec(input("Enter code: "))
+    exec(input("Code: "))
