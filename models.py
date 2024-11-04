@@ -173,10 +173,12 @@ class DI:
     def load(ref: Ref = Ref()):
         # Check if Firebase is enabled
         if FireRTDB.checkPermissions():
+            # Cloud enabled
             if not FireConn.connected:
-                print("DI LOAD WARNING: FireRTDB is enabled but Firebase connection is not established; falling back to local...")
+                print("DI LOAD WARNING: FireRTDB is enabled but Firebase connection is not established; falling back on local load.")
                 return DI.loadLocal(ref)
         else:
+            # No cloud
             return DI.loadLocal(ref)
         
         ## Retrieve data from Firebase
@@ -189,3 +191,27 @@ class DI:
             DI.syncStatus = False
             print("DI LOAD WARNING: Failed to load from FireRTDB; error: '{}'. Falling back to local...".format(e))
             return DI.loadLocal(ref)
+    
+    @staticmethod
+    def save(payload, ref: Ref = Ref()):
+        DI.efficientDataWrite(payload, ref)
+        
+        # Check if Firebase is enabled
+        if not FireRTDB.checkPermissions():
+            return
+        if not FireConn.connected:
+            print("DI SAVE WARNING: Save only persisted locally; FireRTDB enabled but connection is not established.")
+            return True
+        
+        ## Firebase enabled and connected
+        try:
+            res = FireRTDB.setRef(payload, str(ref))
+            if res != True:
+                DI.syncStatus = False
+                print("DI SAVE WARNING: Save only persisted locally; FireRTDB save failed.")
+            
+        except Exception as e:
+            DI.syncStatus = False
+            print("DI SAVE WARNING: Save only persisted locally; error in FireRTDB save: {}".format(e))
+        
+        return True
