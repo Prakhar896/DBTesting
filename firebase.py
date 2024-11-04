@@ -156,8 +156,16 @@ class FireRTDB:
         return data
     
     @staticmethod
-    def translateForLocal(fetchedData):
+    def translateForLocal(fetchedData, rootTranslatable=False):
         '''Returns a translated data structure that can be stored locally.'''
+        if fetchedData == None:
+            return None
+        if rootTranslatable:
+            if fetchedData == 0:
+                return {}
+            elif fetchedData == 1:
+                return []
+        
         tempData = copy.deepcopy(fetchedData)
 
         try:
@@ -172,8 +180,18 @@ class FireRTDB:
         return tempData
     
     @staticmethod
-    def translateForCloud(loadedData):
+    def translateForCloud(loadedData, rootTranslatable=False):
         '''Returns a translated data structure that can be stored in the cloud.'''
+        if loadedData == None:
+            return None
+        if rootTranslatable:
+            if loadedData == {}:
+                return 0
+            elif loadedData == []:
+                return 1
+            elif not (isinstance(loadedData, dict) or isinstance(loadedData, list)):
+                return loadedData
+
         tempData = copy.deepcopy(loadedData)
 
         # Further translation here

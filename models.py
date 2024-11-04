@@ -189,8 +189,7 @@ class DI:
                     print("DI SYNC ERROR: Failed to load local ref '{}'; error: {}".format(unsyncedRef, localSave))
                 if localSave != None:
                     # Firebase considers None values as removal of the object, so if the unsynced data is not a data removal, translate it for Firebase compatibility
-                    localSave = FireRTDB.translateForCloud(localSave)
-                    
+                    localSave = FireRTDB.translateForCloud(localSave, rootTranslatable=True)
                 
                 res = None
                 if localSave == None:
@@ -233,7 +232,7 @@ class DI:
         
         ## Retrieve data from Firebase
         try:
-            data = FireRTDB.translateForLocal(FireRTDB.getRef(str(ref)))
+            data = FireRTDB.translateForLocal(FireRTDB.getRef(str(ref)), rootTranslatable=True)
             DI.efficientDataWrite(data, ref)
             
             return data
@@ -262,7 +261,7 @@ class DI:
             if payload == None:
                 res = FireRTDB.clearRef(str(ref))
             else:
-                res = FireRTDB.setRef(FireRTDB.translateForCloud(payload), str(ref))
+                res = FireRTDB.setRef(FireRTDB.translateForCloud(payload, rootTranslatable=True), str(ref))
             
             if res != True:
                 DI.syncStatus = False
