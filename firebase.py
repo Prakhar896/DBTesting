@@ -98,30 +98,27 @@ class FireRTDB:
     def setRef(data, refPath="/"):
         '''Returns True upon successful update. Providing `refPath` is optional; will be the root reference if not provided.'''
         if not FireRTDB.checkPermissions():
-            return "ERROR: FireRTDB service operation permission denied."
+            raise Exception("ERROR: FireRTDB service operation permission denied.")
         try:
             ref = db.reference(refPath)
             ref.set(data)
         except Exception as e:
-            return "ERROR: Error occurred in setting data at that ref; error: {}".format(e)
+            raise Exception("ERROR: Error occurred in setting data at that ref; error: {}".format(e))
         return True
 
     @staticmethod
     def getRef(refPath="/"):
         '''Returns a dictionary of the data at the specified ref. Providing `refPath` is optional; will be the root reference if not provided.'''
         if not FireRTDB.checkPermissions():
-            return "ERROR: FireRTDB service operation permission denied."
+            raise Exception("ERROR: FireRTDB service operation permission denied.")
         data = None
         try:
             ref = db.reference(refPath)
             data = ref.get()
         except Exception as e:
-            return "ERROR: Error occurred in getting data from that ref; error: {}".format(e)
+            raise Exception("ERROR: Error occurred in getting data from that ref; error: {}".format(e))
         
-        if data == None:
-            return {}
-        else:
-            return data
+        return data
         
     @staticmethod
     def recursiveReplacement(obj, purpose):
