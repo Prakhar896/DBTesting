@@ -98,9 +98,13 @@ class DI:
                 except KeyError:
                     referenceNotFound = True
                 
-                if not referenceNotFound and payload == None:
+                if referenceNotFound and payload == None:
+                    print("Case 0")
+                    return
+                elif not referenceNotFound and payload == None:
                     # Data exists at local reference but payload is None
                     dumpRequired = True
+                    print("Case 1")
                     targetDataPointer = localData
                     
                     # Anchor on parent ref of target ref and update child ref subscripted on targetDataPointer (thus updating localData)
@@ -109,8 +113,9 @@ class DI:
                     targetDataPointer[ref.subscripts[-1]] = None
                 elif referenceNotFound and payload != None:
                     # Local reference does not exist but payload is not None
-                    
                     dumpRequired = True
+                    print("Case 2")
+                    
                     # Create parent branches, if they don't already exist. For the last subscript, set the payload.
                     targetDataPointer = localData
                     for subscriptIndex in range(len(ref.subscripts)):
@@ -118,11 +123,13 @@ class DI:
                             targetDataPointer[ref.subscripts[subscriptIndex]] = payload
                         elif ref.subscripts[subscriptIndex] not in targetDataPointer:
                             targetDataPointer[ref.subscripts[subscriptIndex]] = {}
-                            targetDataPointer = targetDataPointer[ref.subscripts[subscriptIndex]]
+                        
+                        targetDataPointer = targetDataPointer[ref.subscripts[subscriptIndex]]
                     
                 elif targetDataPointer != payload:
                     # Local reference exists but data does not match with the payload
                     dumpRequired = True
+                    print("Case 3")
                     targetDataPointer = localData
                     
                     # Anchor on parent ref of target ref and update child ref subscripted on targetDataPointer (thus updating localData)

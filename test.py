@@ -1,5 +1,5 @@
 from models import *
-# DI.failoverStrategy = "efficient"
+DI.failoverStrategy = "efficient"
 DI.setup()
 
 while True:
