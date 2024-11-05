@@ -1,10 +1,9 @@
 from models import *
-DI.failoverStrategy = "efficient"
 DI.setup()
+DI.save(None, Ref())
 
-data = {"name": "john", "last": "oliver"}
-# DI.save(data, Ref("account"))
-# DI.load(Ref("account"))
+john = Identity('abc123', 'john', '123456', '2024-t2323r23r')
+john.save()
 
 while True:
     try:
