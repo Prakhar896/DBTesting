@@ -4,6 +4,12 @@ class Ref:
     def __init__(self, *subscripts: tuple[str]) -> None:
         self.subscripts = list(subscripts)
         
+    def __eq__(self, value: object) -> bool:
+        if not isinstance(value, Ref):
+            return False
+        
+        return self.subscripts == value.subscripts
+        
     def __str__(self) -> str:
         return "/".join(self.subscripts)
     

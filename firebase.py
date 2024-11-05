@@ -39,7 +39,8 @@ class FireConn:
                 ## Firebase
                 cred_obj = credentials.Certificate(os.path.join(os.getcwd(), "serviceAccountKey.json"))
                 default_app = initialize_app(cred_obj, {
-                    'databaseURL': os.environ["RTDB_URL"]
+                    'databaseURL': os.environ["RTDB_URL"],
+                    'httpTimeout': 5
                 })
                 FireConn.connected = True
             except Exception as e:

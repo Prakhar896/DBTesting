@@ -175,6 +175,15 @@ class DI:
         return data
     
     @staticmethod
+    def newUnsyncedRef(ref: Ref):
+        for x in DI.unsyncedRefs:
+            if x == ref:
+                return True
+        
+        DI.unsyncedRefs.append(ref)
+        return True
+    
+    @staticmethod
     def synchronise():
         '''This method is activated in the event of an unsynchronised state faced by DI. It tries to update Firebase with unsynced data objects, to which references are stored in the memory. If even one of the synchronisations fail, parent functions are discouraged to use Firebase. Otherwise, DI returns to synchronised state and operates normally in a Firebase-first manner.'''
         if DI.syncStatus:
@@ -184,6 +193,7 @@ class DI:
             return False
         
         errors = False
+        syncedRefs = []
         for unsyncedRefIndex in range(len(DI.unsyncedRefs)):
             # Iterate through unsynced references and try to write their data to Firebase
             unsyncedRef = DI.unsyncedRefs[unsyncedRefIndex]
@@ -202,12 +212,16 @@ class DI:
                     res = FireRTDB.setRef(localSave, str(unsyncedRef))
                 
                 if res == True:
-                    DI.unsyncedRefs.pop(unsyncedRefIndex)
+                    # DI.unsyncedRefs.pop(unsyncedRefIndex)
+                    syncedRefs.append(DI.unsyncedRefs[unsyncedRefIndex])
                 else:
                     errors = True
             except Exception as e:
                 errors = True
                 print("DI SYNC ERROR: Failed to sync local ref '{}' to FireRTDB; error: {}".format(unsyncedRef, e))
+                
+        for ref in syncedRefs:
+            DI.unsyncedRefs.remove(ref)
                 
         if errors:
             # One or more unsynced references failed to be saved to Firebase, return False to discourage Firebase-first methodology. Sync status remains False
@@ -247,6 +261,7 @@ class DI:
     @staticmethod
     def save(payload, ref: Ref = Ref()):
         DI.efficientDataWrite(payload, ref)
+        DI.synchronise()
         
         # Check if Firebase is enabled
         if not FireRTDB.checkPermissions():
@@ -256,7 +271,7 @@ class DI:
             return True
         if not DI.syncStatus:
             # Unsync-ed state, unsafe for FB operations
-            DI.unsyncedRefs.append(ref)
+            DI.newUnsyncedRef(ref)
             return True
         
         ## Firebase enabled and connected
@@ -269,12 +284,12 @@ class DI:
             
             if res != True:
                 DI.syncStatus = False
-                DI.unsyncedRefs.append(ref)
+                DI.newUnsyncedRef(ref)
                 print("DI SAVE WARNING: Save only persisted locally; FireRTDB save failed.")
             
         except Exception as e:
             DI.syncStatus = False
-            DI.unsyncedRefs.append(ref)
+            DI.newUnsyncedRef(ref)
             print("DI SAVE WARNING: Save only persisted locally; error in FireRTDB save: {}".format(e))
         
         return True
